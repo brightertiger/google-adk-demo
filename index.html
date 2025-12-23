@@ -5,22 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agents Demo - Multi-Agent System for Web Information Extraction</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwindcss.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
+                        sans: ['DM Sans', 'system-ui', 'sans-serif'],
+                        mono: ['DM Mono', 'monospace'],
                     },
                     colors: {
-                        midnight: '#0f0f23',
-                        deep: '#1a1a2e',
-                        accent: '#00d4aa',
-                        glow: '#7c3aed',
-                        surface: '#16213e',
+                        sand: '#faf9f7',
+                        warm: '#f5f3f0',
+                        stone: '#e8e6e3',
+                        ink: '#1a1a1a',
+                        muted: '#6b6b6b',
+                        coral: '#e07a5f',
+                        sage: '#81b29a',
+                        ocean: '#3d5a80',
                     }
                 }
             }
@@ -28,298 +31,242 @@
     </script>
     <style>
         body {
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            background-color: #faf9f7;
         }
-        .gradient-text {
-            background: linear-gradient(135deg, #00d4aa 0%, #7c3aed 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .subtle-border {
+            border: 1px solid #e8e6e3;
         }
-        .card {
-            background: rgba(22, 33, 62, 0.6);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(124, 58, 237, 0.2);
-            transition: all 0.3s ease;
+        .agent-card {
+            transition: all 0.2s ease;
         }
-        .card:hover {
-            border-color: rgba(0, 212, 170, 0.5);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0, 212, 170, 0.1);
+        .agent-card:hover {
+            background-color: #f5f3f0;
         }
-        .glow-border {
-            position: relative;
+        .code-block {
+            background: #1a1a1a;
+            color: #e8e6e3;
         }
-        .glow-border::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            background: linear-gradient(135deg, #00d4aa, #7c3aed);
-            border-radius: inherit;
-            z-index: -1;
-            opacity: 0.5;
-            filter: blur(10px);
-        }
-        .agent-flow {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        .agent-node {
-            background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(0, 212, 170, 0.1));
-            border: 1px solid rgba(0, 212, 170, 0.3);
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.875rem;
-        }
-        .arrow {
-            color: #00d4aa;
-            font-size: 1.5rem;
-        }
-        .version-badge {
-            background: linear-gradient(135deg, #7c3aed, #00d4aa);
+        .tag {
+            background: #f5f3f0;
+            color: #6b6b6b;
+            font-size: 0.75rem;
             padding: 0.25rem 0.75rem;
             border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        .float-animation {
-            animation: float 3s ease-in-out infinite;
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
         }
     </style>
 </head>
 
-<body class="min-h-screen text-gray-100 font-sans">
-    <!-- Hero Section -->
-    <header class="relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-glow/10 to-transparent"></div>
-        <div class="container mx-auto px-6 py-20 relative z-10">
-            <div class="flex flex-col items-center text-center">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="version-badge">Google ADK 1.21+</span>
-                    <span class="version-badge">MCP 1.25+</span>
-                </div>
-                <h1 class="text-5xl md:text-7xl font-bold mb-6">
-                    <span class="gradient-text">Agents Demo</span>
-                </h1>
-                <p class="text-xl md:text-2xl text-gray-400 max-w-3xl leading-relaxed">
-                    A multi-agent system where AI agents collaborate to extract addresses from web pages 
-                    and convert them to geographic coordinates.
-                </p>
-                <div class="mt-10 flex gap-4">
-                    <a href="https://github.com/yourusername/agents-demo" class="bg-accent hover:bg-accent/80 text-midnight font-semibold px-6 py-3 rounded-lg transition-all">
-                        View on GitHub
-                    </a>
-                    <a href="#how-it-works" class="border border-gray-600 hover:border-accent text-gray-300 hover:text-accent px-6 py-3 rounded-lg transition-all">
-                        Learn More
-                    </a>
-                </div>
+<body class="min-h-screen text-ink font-sans antialiased">
+    <!-- Navigation -->
+    <nav class="border-b border-stone">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+            <span class="font-semibold text-lg">agents-demo</span>
+            <div class="flex items-center gap-6">
+                <a href="#agents" class="text-muted hover:text-ink transition-colors text-sm">Agents</a>
+                <a href="#stack" class="text-muted hover:text-ink transition-colors text-sm">Stack</a>
+                <a href="https://github.com/yourusername/agents-demo" class="text-sm bg-ink text-sand px-4 py-2 rounded-lg hover:bg-ink/80 transition-colors">
+                    GitHub
+                </a>
             </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="max-w-5xl mx-auto px-6 py-24">
+        <div class="max-w-2xl">
+            <div class="flex items-center gap-2 mb-6">
+                <span class="tag">Google ADK 1.21+</span>
+                <span class="tag">MCP 1.25+</span>
+            </div>
+            <h1 class="text-5xl font-bold tracking-tight mb-6">
+                Multi-agent web extraction
+            </h1>
+            <p class="text-xl text-muted leading-relaxed">
+                AI agents that work together to crawl web pages, extract addresses, 
+                and convert them to geographic coordinates.
+            </p>
         </div>
     </header>
 
-    <!-- Agent Flow Visualization -->
-    <section id="how-it-works" class="py-20">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center mb-4 gradient-text">How It Works</h2>
-            <p class="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
-                The system orchestrates multiple specialized agents through a Manager Agent
-            </p>
-            <div class="agent-flow">
-                <div class="agent-node">📋 Manager</div>
-                <span class="arrow">→</span>
-                <div class="agent-node">🌐 Crawler</div>
-                <span class="arrow">→</span>
-                <div class="agent-node">📍 Address</div>
-                <span class="arrow">→</span>
-                <div class="agent-node">🗺️ Geocoding</div>
-                <span class="arrow">→</span>
-                <div class="agent-node text-accent">📄 JSON</div>
+    <!-- Flow Section -->
+    <section class="max-w-5xl mx-auto px-6 pb-24">
+        <div class="subtle-border rounded-2xl p-8 bg-white">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="dot bg-ocean"></div>
+                    <span class="font-medium">Manager</span>
+                </div>
+                <span class="text-stone text-2xl">→</span>
+                <div class="flex items-center gap-3">
+                    <div class="dot bg-coral"></div>
+                    <span class="font-medium">Crawler</span>
+                </div>
+                <span class="text-stone text-2xl">→</span>
+                <div class="flex items-center gap-3">
+                    <div class="dot bg-sage"></div>
+                    <span class="font-medium">Address</span>
+                </div>
+                <span class="text-stone text-2xl">→</span>
+                <div class="flex items-center gap-3">
+                    <div class="dot bg-ocean"></div>
+                    <span class="font-medium">Geocoding</span>
+                </div>
+                <span class="text-stone text-2xl">→</span>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-warm rounded flex items-center justify-center">
+                        <span class="text-sm">{ }</span>
+                    </div>
+                    <span class="font-medium">JSON</span>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Agent Architecture Section -->
-    <section class="py-20">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center mb-4 gradient-text">Agent Architecture</h2>
-            <p class="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
-                Four specialized agents working together through the MCP protocol
-            </p>
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="card rounded-xl p-6">
-                    <div class="text-4xl mb-4">🎯</div>
-                    <h3 class="text-xl font-semibold mb-2 text-accent">Manager Agent</h3>
-                    <p class="text-gray-400 text-sm">Orchestrates the workflow and delegates tasks to specialized agents</p>
-                    <div class="mt-4 pt-4 border-t border-gray-700">
-                        <span class="text-xs font-mono text-glow">Has MCP Tools</span>
+    <!-- Agents Section -->
+    <section id="agents" class="max-w-5xl mx-auto px-6 pb-24">
+        <h2 class="text-sm font-medium text-muted uppercase tracking-wider mb-8">Agents</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="agent-card subtle-border rounded-xl p-6 bg-white">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-ocean/10 rounded-lg flex items-center justify-center">
+                            <span class="text-ocean">◎</span>
+                        </div>
+                        <h3 class="font-semibold">Manager Agent</h3>
                     </div>
                 </div>
-                <div class="card rounded-xl p-6">
-                    <div class="text-4xl mb-4">🌐</div>
-                    <h3 class="text-xl font-semibold mb-2 text-accent">Crawler Agent</h3>
-                    <p class="text-gray-400 text-sm">Fetches and cleans webpage content using BeautifulSoup4</p>
-                    <div class="mt-4 pt-4 border-t border-gray-700">
-                        <code class="text-xs font-mono text-glow">crawl_to_markdown</code>
+                <p class="text-muted text-sm leading-relaxed mb-4">
+                    Orchestrates the entire workflow. Receives requests and delegates tasks to specialized agents.
+                </p>
+                <span class="tag">Has MCP Tools</span>
+            </div>
+
+            <div class="agent-card subtle-border rounded-xl p-6 bg-white">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-coral/10 rounded-lg flex items-center justify-center">
+                            <span class="text-coral">⊕</span>
+                        </div>
+                        <h3 class="font-semibold">Crawler Agent</h3>
                     </div>
                 </div>
-                <div class="card rounded-xl p-6">
-                    <div class="text-4xl mb-4">📍</div>
-                    <h3 class="text-xl font-semibold mb-2 text-accent">Address Agent</h3>
-                    <p class="text-gray-400 text-sm">Extracts structured address information using LLM reasoning</p>
-                    <div class="mt-4 pt-4 border-t border-gray-700">
-                        <span class="text-xs font-mono text-gray-500">LLM-based extraction</span>
+                <p class="text-muted text-sm leading-relaxed mb-4">
+                    Fetches web pages and extracts clean text content using BeautifulSoup4.
+                </p>
+                <code class="font-mono text-xs bg-warm px-2 py-1 rounded">crawl_to_markdown</code>
+            </div>
+
+            <div class="agent-card subtle-border rounded-xl p-6 bg-white">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-sage/10 rounded-lg flex items-center justify-center">
+                            <span class="text-sage">◈</span>
+                        </div>
+                        <h3 class="font-semibold">Address Agent</h3>
                     </div>
                 </div>
-                <div class="card rounded-xl p-6">
-                    <div class="text-4xl mb-4">🗺️</div>
-                    <h3 class="text-xl font-semibold mb-2 text-accent">Geocoding Agent</h3>
-                    <p class="text-gray-400 text-sm">Converts addresses to lat/long using OpenStreetMap</p>
-                    <div class="mt-4 pt-4 border-t border-gray-700">
-                        <code class="text-xs font-mono text-glow">geocode_address</code>
+                <p class="text-muted text-sm leading-relaxed mb-4">
+                    Uses LLM reasoning to identify and extract structured address information from text.
+                </p>
+                <span class="tag">LLM-based</span>
+            </div>
+
+            <div class="agent-card subtle-border rounded-xl p-6 bg-white">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-ocean/10 rounded-lg flex items-center justify-center">
+                            <span class="text-ocean">◇</span>
+                        </div>
+                        <h3 class="font-semibold">Geocoding Agent</h3>
                     </div>
                 </div>
+                <p class="text-muted text-sm leading-relaxed mb-4">
+                    Converts addresses to latitude/longitude coordinates using OpenStreetMap Nominatim.
+                </p>
+                <code class="font-mono text-xs bg-warm px-2 py-1 rounded">geocode_address</code>
             </div>
         </div>
     </section>
 
     <!-- Screenshots Section -->
-    <section class="py-20">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center mb-12 gradient-text">System in Action</h2>
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="card rounded-xl overflow-hidden">
-                    <img src="assets/agent_output.png" alt="Agent Output" class="w-full">
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2 text-accent">Agent Output</h3>
-                        <p class="text-gray-400">Structured JSON output with extracted addresses</p>
-                    </div>
+    <section class="max-w-5xl mx-auto px-6 pb-24">
+        <h2 class="text-sm font-medium text-muted uppercase tracking-wider mb-8">Preview</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="subtle-border rounded-xl overflow-hidden bg-white">
+                <img src="assets/agent_output.png" alt="Agent Output" class="w-full">
+                <div class="p-5 border-t border-stone">
+                    <h3 class="font-medium mb-1">Agent Output</h3>
+                    <p class="text-muted text-sm">Structured JSON with extracted addresses</p>
                 </div>
-                <div class="card rounded-xl overflow-hidden">
-                    <img src="assets/mcp_server.png" alt="MCP Server" class="w-full">
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2 text-accent">MCP Server</h3>
-                        <p class="text-gray-400">Model Context Protocol server with custom tools</p>
-                    </div>
+            </div>
+            <div class="subtle-border rounded-xl overflow-hidden bg-white">
+                <img src="assets/mcp_server.png" alt="MCP Server" class="w-full">
+                <div class="p-5 border-t border-stone">
+                    <h3 class="font-medium mb-1">MCP Server</h3>
+                    <p class="text-muted text-sm">Model Context Protocol server logs</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Technical Stack Section -->
-    <section class="py-20">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center mb-12 gradient-text">Technical Stack</h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="card rounded-xl p-6">
-                    <h3 class="text-xl font-semibold mb-6 text-center">Core Framework</h3>
-                    <ul class="space-y-3">
-                        <li class="flex items-center gap-3">
-                            <span class="text-accent">▸</span>
-                            <span>Google ADK <code class="text-glow text-sm">≥1.21.0</code></span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <span class="text-accent">▸</span>
-                            <span>MCP <code class="text-glow text-sm">≥1.25.0</code></span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <span class="text-accent">▸</span>
-                            <span>LiteLLM <code class="text-glow text-sm">≥1.80.0</code></span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <span class="text-accent">▸</span>
-                            <span>Python <code class="text-glow text-sm">≥3.12</code></span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="card rounded-xl p-6">
-                    <h3 class="text-xl font-semibold mb-6 text-center">Tools & Libraries</h3>
-                    <ul class="space-y-3">
-                        <li class="flex items-center gap-3">
-                            <span class="text-accent">▸</span>
-                            <span>BeautifulSoup4</span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <span class="text-accent">▸</span>
-                            <span>JSON Repair</span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <span class="text-accent">▸</span>
-                            <span>OpenStreetMap Nominatim</span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <span class="text-accent">▸</span>
-                            <span>Gemini 2.0 Flash</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="card rounded-xl p-6">
-                    <h3 class="text-xl font-semibold mb-6 text-center">Features</h3>
-                    <ul class="space-y-3">
-                        <li class="flex items-center gap-3">
-                            <span class="text-accent">▸</span>
-                            <span>Multi-agent orchestration</span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <span class="text-accent">▸</span>
-                            <span>Async processing</span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <span class="text-accent">▸</span>
-                            <span>Structured JSON output</span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <span class="text-accent">▸</span>
-                            <span>Error recovery</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+    <!-- Stack Section -->
+    <section id="stack" class="max-w-5xl mx-auto px-6 pb-24">
+        <h2 class="text-sm font-medium text-muted uppercase tracking-wider mb-8">Stack</h2>
+        <div class="subtle-border rounded-xl bg-white overflow-hidden">
+            <table class="w-full">
+                <tbody class="divide-y divide-stone">
+                    <tr>
+                        <td class="px-6 py-4 font-medium">google-adk</td>
+                        <td class="px-6 py-4 text-muted">Agent Development Kit</td>
+                        <td class="px-6 py-4 text-right font-mono text-sm">≥1.21.0</td>
+                    </tr>
+                    <tr>
+                        <td class="px-6 py-4 font-medium">mcp</td>
+                        <td class="px-6 py-4 text-muted">Model Context Protocol</td>
+                        <td class="px-6 py-4 text-right font-mono text-sm">≥1.25.0</td>
+                    </tr>
+                    <tr>
+                        <td class="px-6 py-4 font-medium">litellm</td>
+                        <td class="px-6 py-4 text-muted">LLM API wrapper</td>
+                        <td class="px-6 py-4 text-right font-mono text-sm">≥1.80.0</td>
+                    </tr>
+                    <tr>
+                        <td class="px-6 py-4 font-medium">beautifulsoup4</td>
+                        <td class="px-6 py-4 text-muted">HTML parsing</td>
+                        <td class="px-6 py-4 text-right font-mono text-sm">≥4.13.0</td>
+                    </tr>
+                    <tr>
+                        <td class="px-6 py-4 font-medium">gemini-2.0-flash</td>
+                        <td class="px-6 py-4 text-muted">Language model</td>
+                        <td class="px-6 py-4 text-right font-mono text-sm">via LiteLLM</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </section>
 
     <!-- Quick Start Section -->
-    <section class="py-20">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center mb-12 gradient-text">Quick Start</h2>
-            <div class="max-w-2xl mx-auto card rounded-xl p-8">
-                <div class="space-y-4 font-mono text-sm">
-                    <div class="flex items-start gap-2">
-                        <span class="text-gray-500">$</span>
-                        <span>git clone https://github.com/yourusername/agents-demo.git</span>
-                    </div>
-                    <div class="flex items-start gap-2">
-                        <span class="text-gray-500">$</span>
-                        <span>cd agents-demo</span>
-                    </div>
-                    <div class="flex items-start gap-2">
-                        <span class="text-gray-500">$</span>
-                        <span>pip install -e .</span>
-                    </div>
-                    <div class="flex items-start gap-2">
-                        <span class="text-gray-500">$</span>
-                        <span>export <span class="text-accent">GOOGLE_API_KEY</span>=your_api_key</span>
-                    </div>
-                    <div class="flex items-start gap-2">
-                        <span class="text-gray-500">$</span>
-                        <span>python src/agents/agent.py</span>
-                    </div>
-                </div>
-            </div>
+    <section class="max-w-5xl mx-auto px-6 pb-24">
+        <h2 class="text-sm font-medium text-muted uppercase tracking-wider mb-8">Quick Start</h2>
+        <div class="code-block rounded-xl p-6 font-mono text-sm leading-loose">
+            <div><span class="text-muted">$</span> git clone https://github.com/yourusername/agents-demo.git</div>
+            <div><span class="text-muted">$</span> cd agents-demo</div>
+            <div><span class="text-muted">$</span> pip install -e .</div>
+            <div><span class="text-muted">$</span> export <span class="text-sage">GOOGLE_API_KEY</span>=your_api_key</div>
+            <div><span class="text-muted">$</span> python src/agents/agent.py</div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="py-12 border-t border-gray-800">
-        <div class="container mx-auto px-6 text-center">
-            <p class="text-gray-500">&copy; 2025 Agents Demo. Built with Google ADK & MCP.</p>
+    <footer class="border-t border-stone">
+        <div class="max-w-5xl mx-auto px-6 py-8 flex items-center justify-between">
+            <span class="text-muted text-sm">© 2025 Agents Demo</span>
+            <span class="text-muted text-sm">Built with Google ADK & MCP</span>
         </div>
     </footer>
 </body>
