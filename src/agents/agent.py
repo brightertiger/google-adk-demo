@@ -12,11 +12,8 @@ from google.adk.models.lite_llm import LiteLlm
 from google.adk.sessions import InMemorySessionService
 from google.adk.runners import Runner
 from google.genai import types
-from google.adk.tools.mcp_tool.mcp_toolset import (
-    MCPToolset,
-    SseServerParams,
-    StdioServerParameters,
-)
+from google.adk.tools.mcp_tool.mcp_toolset import McpToolset, StdioConnectionParams
+from mcp.client.stdio import StdioServerParameters
 
 litellm.suppress_debug_info = True
 logging.basicConfig(
@@ -32,14 +29,16 @@ APP_NAME = "adk_agent"
 
 async def get_tools_async(path_to_mcp_server: str):
     logger.info("Attempting to connect to MCP Filesystem server...")
-    tools, exit_stack = await MCPToolset.from_server(
-        connection_params=StdioServerParameters(
-            command="python",
-            args=[path_to_mcp_server],
+    toolset = McpToolset(
+        connection_params=StdioConnectionParams(
+            server_params=StdioServerParameters(
+                command="python", args=[path_to_mcp_server]
+            )
         )
     )
+    tools = await toolset.get_tools()
     logger.info("MCP Toolset created successfully.")
-    return tools, exit_stack
+    return tools, toolset
 
 
 async def get_specialist_agent(config: dict, tools: list):
@@ -118,12 +117,12 @@ async def call_agent_async(query: str, user_id: str, session_id: str, runner: Ru
 
 
 async def main(config: dict, query: str, user_id: str, session_id: str):
-    tools, exit_stack = await get_tools_async(
+    tools, toolset = await get_tools_async(
         path_to_mcp_server=config["mcp_server"]["path"]
     )
     agent = await get_manager_agent(config, tools)
     session_service = InMemorySessionService()
-    session = session_service.create_session(
+    session = await session_service.create_session(
         app_name=APP_NAME, user_id=user_id, session_id=session_id
     )
     runner = Runner(
@@ -143,7 +142,7 @@ async def main(config: dict, query: str, user_id: str, session_id: str):
         logger.info("Output: %s", json.dumps(output, indent=4))
         json.dump(output, open("output.json", "w"), indent=4)
     finally:
-        await exit_stack.aclose()
+        await toolset.close()
 
 
 if __name__ == "__main__":

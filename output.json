@@ -15,6 +15,20 @@
             "country": "India"
         },
         {
+            "address": "Rio Business Park, Mahadevapura Village, Krishnarajapuram, Hobli, Bengaluru East",
+            "city": "Bengaluru",
+            "state": "Karnataka",
+            "zip": "560037",
+            "country": "India"
+        },
+        {
+            "address": "Bagmane Capital Park, Kyoto West Tower, Dodanakundi, Circle, Marathahalli Post",
+            "city": "Bengaluru",
+            "state": "Karnataka",
+            "zip": "560048",
+            "country": "India"
+        },
+        {
             "address": "Google Mumbai Office, 1st Floor, 3 North Avenue, Maker Maxity, Bandra Kurla Complex, Bandra East",
             "city": "Mumbai",
             "state": "Maharashtra",

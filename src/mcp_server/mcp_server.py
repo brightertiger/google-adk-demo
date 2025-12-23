@@ -13,9 +13,8 @@ mcp = FastMCP("Web Tool Server")
     description="Crawl a web page and convert it to markdown",
 )
 def crawl_to_markdown(url: str) -> str:
-    """Crawl a web page and convert it to markdown"""
     response = requests.get(url)
-    response.raise_for_status()  # Raise exception for HTTP errors
+    response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
     for script in soup(["script", "style"]):
         script.extract()
@@ -23,29 +22,27 @@ def crawl_to_markdown(url: str) -> str:
     lines = (line.strip() for line in text.splitlines())
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
     text = "\n".join(chunk for chunk in chunks if chunk)
-    return {"page_content": text}
+    return text
 
 
 @mcp.tool(
     name="geocode_address",
     description="Convert an address to geographic coordinates using OpenStreetMap",
 )
-def geocode_address(addresses: dict | str) -> dict:
-    """Convert an address to geographic coordinates"""
+def geocode_address(addresses: str) -> str:
     if not isinstance(addresses, str):
         addresses = str(addresses)
     addresses = repair_json(addresses)
-    addresses = json.loads(addresses)
+    addresses_data = json.loads(addresses)
     default = {
         "geocoded_locations": [
             x | {"latitude": 0.0, "longitude": 0.0}
-            for x in addresses.get("addresses", [])
+            for x in addresses_data.get("addresses", [])
         ]
     }
     try:
         output = []
-        for address_object in addresses.get("addresses", []):
-            output_ = {}
+        for address_object in addresses_data.get("addresses", []):
             address_string = f"{address_object.get('address', '')}, "
             address_string += f"{address_object.get('city', '')}, "
             address_string += f"{address_object.get('state', '')}, "
@@ -72,9 +69,9 @@ def geocode_address(addresses: dict | str) -> dict:
                 output_["latitude"] = str(result["lat"])
                 output_["longitude"] = str(result["lon"])
             output.append(output_)
-        return output
+        return json.dumps({"geocoded_locations": output})
     except Exception as e:
-        return default
+        return json.dumps(default)
 
 
 if __name__ == "__main__":
